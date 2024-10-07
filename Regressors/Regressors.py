@@ -37,17 +37,18 @@ mae_KNN = []
 
 for _ in range(20):
 
-    dados = pd.read_excel("../Dataset/ResidencialBuilding.xlsx")
+    dados = pd.read_excel("../Dataset/data.xlsx")
 
     dados = shuffle(dados)
 
-    X = dados.iloc[:, :-2]  
+    X = dados.iloc[:, :-1]  
     Y = dados.iloc[:, 2:]  # Outputs
 
     x_treino, x_temp, y_treino, y_temp = train_test_split(X, Y, test_size=0.5)
     x_validacao, x_teste, y_validacao, y_teste = train_test_split(x_temp, y_temp, test_size=0.5)
 
     i, j = grid_search_KNR()
+    print(i,j)
     KNN = KNeighborsRegressor(n_neighbors=i,weights=j)
     KNN.fit(x_treino,y_treino)
 
@@ -56,3 +57,4 @@ for _ in range(20):
     mae_KNN.append(mean_absolute_error(y_validacao, opiniao))
     mse_KNN.append(mean_squared_error(y_validacao, opiniao))
     rmse_KNN.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
+    print(mae_KNN, mse_KNN, rmse_KNN)
