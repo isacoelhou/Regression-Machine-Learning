@@ -100,8 +100,8 @@ for _ in range(20):
 
     dados = shuffle(dados)
 
-    X = dados.iloc[:, :-1]  
-    Y = dados.iloc[:, :] 
+    X = dados.iloc[:,:-1]
+    Y = dados.iloc[:,-1]
 
     x_treino, x_temp, y_treino, y_temp = train_test_split(X, Y, test_size=0.5)
     x_validacao, x_teste, y_validacao, y_teste = train_test_split(x_temp, y_temp, test_size=0.5)
