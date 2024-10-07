@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import numpy as np
+from sklearn.svm import SVR
 
 def grid_search_KNR():
 
@@ -13,10 +14,10 @@ def grid_search_KNR():
     for j in ("distance","uniform"):
         for i in range (1,50):
 
-            KNN = KNeighborsRegressor(n_neighbors=i,weights=j)
-            KNN.fit(x_treino, y_treino)
+            KNR = KNeighborsRegressor(n_neighbors=i,weights=j)
+            KNR.fit(x_treino, y_treino)
 
-            opiniao = KNN.predict(x_validacao)
+            opiniao = KNR.predict(x_validacao)
 
             mae = mean_absolute_error(y_validacao, opiniao)
             mse = mean_squared_error(y_validacao, opiniao)
@@ -30,10 +31,36 @@ def grid_search_KNR():
 
     return best_n, best_w
 
+def grid_search_SVR():
+    
+    maior = 10000000000
 
-rmse_KNN = []
-mse_KNN = []
-mae_KNN = []
+    for k in ("linear", "poly", "rbf", "sigmoid"):
+        for i in (0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 1): 
+
+            SVR_ = SVR(kernel=k,C=i)
+            SVR_.fit(x_treino, y_treino)
+
+            opiniao = SVR_.predict(x_validacao)
+
+            mae = mean_absolute_error(y_validacao, opiniao)
+            mse = mean_squared_error(y_validacao, opiniao)
+            rmse = np.sqrt(mse)
+
+            media = (mae + mse + rmse)/3
+
+            if(media < maior):
+                best_k = k
+                best_i = i
+
+    return best_k, best_i
+           
+rmse_KNR = []
+mse_KNR = []
+mae_KNR = []
+rmse_SVR = []
+mse_SVR = []
+mae_SVR = []
 
 for _ in range(20):
 
@@ -42,19 +69,29 @@ for _ in range(20):
     dados = shuffle(dados)
 
     X = dados.iloc[:, :-1]  
-    Y = dados.iloc[:, 2:]  # Outputs
+    Y = dados.iloc[:, :] 
 
     x_treino, x_temp, y_treino, y_temp = train_test_split(X, Y, test_size=0.5)
     x_validacao, x_teste, y_validacao, y_teste = train_test_split(x_temp, y_temp, test_size=0.5)
 
     i, j = grid_search_KNR()
     print(i,j)
-    KNN = KNeighborsRegressor(n_neighbors=i,weights=j)
-    KNN.fit(x_treino,y_treino)
+    KNR = KNeighborsRegressor(n_neighbors=i,weights=j)
+    KNR.fit(x_treino,y_treino)
 
-    opiniao = KNN.predict(x_teste)
+    opiniao = KNR.predict(x_teste)
 
-    mae_KNN.append(mean_absolute_error(y_validacao, opiniao))
-    mse_KNN.append(mean_squared_error(y_validacao, opiniao))
-    rmse_KNN.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
-    print(mae_KNN, mse_KNN, rmse_KNN)
+    mae_KNR.append(mean_absolute_error(y_validacao, opiniao))
+    mse_KNR.append(mean_squared_error(y_validacao, opiniao))
+    rmse_KNR.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
+
+    i, j = grid_search_SVR()
+    SVR_ = KNeighborsRegressor(kernel=i,C=j)
+    SVR_.fit(x_treino,y_treino)
+
+    opiniao = SVR_.predict(x_teste)
+
+    mae_SVR.append(mean_absolute_error(y_validacao, opiniao))
+    mse_SVR.append(mean_squared_error(y_validacao, opiniao))
+    rmse_SVR.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
+    
