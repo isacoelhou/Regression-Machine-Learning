@@ -9,6 +9,7 @@ import numpy as np
 from sklearn.svm import SVR
 from sklearn.neural_network import MLPRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression
 
 def grid_search_KNR():
 
@@ -24,6 +25,7 @@ def grid_search_KNR():
             rmse = np.sqrt( mean_squared_error(y_validacao, opiniao))
 
             if(rmse < maior):
+                maior = rmse
                 best_n = i
                 best_w = j
 
@@ -44,6 +46,7 @@ def grid_search_SVR():
             rmse = np.sqrt(mean_squared_error(y_validacao, opiniao))
 
             if(rmse < maior):
+                maior = rmse
                 best_k = k
                 best_i = i
 
@@ -64,6 +67,7 @@ def grid_search_MLP():
               rmse = np.sqrt( mean_squared_error(y_validacao, opiniao))
 
               if(rmse < maior):
+                maior = rmse
                 Melhor_i = i
                 Melhor_j = j
                 Melhor_k = k
@@ -79,7 +83,8 @@ def grid_search_RF():
             for max_deaph in range(2, 10, 1):
                 for min_sample_split in range(2, 10, 1):
                     for min_sample_leaf in range(1, 10, 1):
-                        RF = RandomForestRegressor(n_estimators = n_estimators, criterion = criterion, max_depth = max_deaph, min_samples_split = min_sample_split, min_samples_leaf = min_sample_leaf)
+                        RF = RandomForestRegressor(n_estimators = n_estimators, criterion = criterion, max_depth = max_deaph,
+                        min_samples_split = min_sample_split, min_samples_leaf = min_sample_leaf)
 
                         RF.fit(x_treino, y_treino)
                         opiniao = RF.predict(x_validacao)
@@ -87,6 +92,7 @@ def grid_search_RF():
                         rmse = np.sqrt( mean_squared_error(y_validacao, opiniao))
 
                         if(rmse < maior):
+                            maior = rmse
                             melhor_n_estimator = n_estimators
                             melhor_criterion = criterion
                             melhor_max_deaph = max_deaph
@@ -104,7 +110,8 @@ def grid_search_GB():
                 for learning_rate in range(0.1, 1, 0.1):
                     for min_sample_split in range(2, 10, 1):
                         for min_sample_leaf in range(1, 10, 1):
-                            GB = GradientBoostingRegressor(n_estimators=n_estimators, loss=loss, max_depth=max_depth, learning_rate=learning_rate, min_samples_split=min_sample_split, min_samples_leaf=min_sample_leaf)
+                            GB = GradientBoostingRegressor(n_estimators=n_estimators, loss=loss, max_depth=max_depth,
+                            learning_rate=learning_rate, min_samples_split=min_sample_split, min_samples_leaf=min_sample_leaf)
 
                             GB.fit(x_treino, y_treino)
                             opiniao = GB.predict(x_validacao)
@@ -112,6 +119,7 @@ def grid_search_GB():
                             rmse = np.sqrt( mean_squared_error(y_validacao, opiniao))
 
                             if(rmse < maior):
+                                maior = rmse
                                 melhor_n_estimator = n_estimators
                                 melhor_loss = loss
                                 melhor_max_depth = max_depth
@@ -140,6 +148,10 @@ mae_RF = []
 rmse_GB = []
 mse_GB = []
 mae_GB = []
+
+rmse_RLM = []
+mse_RLM = []
+mae_RLM = []
 
 for _ in range(20):
 
@@ -212,4 +224,14 @@ for _ in range(20):
     mae_GB.append(mean_absolute_error(y_validacao, opiniao))
     mse_GB.append(mean_squared_error(y_validacao, opiniao))
     rmse_GB.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
+
+    ##############################################################################
+
+    RLM = LinearRegression()
+
+    RLM.fit(x_treino, y_treino)
+    opiniao = RLM.predict(x_teste)
+    mae_RLM.append(mean_absolute_error(y_validacao, opiniao))
+    mse_RLM.append(mean_squared_error(y_validacao, opiniao))
+    rmse_RLM.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
 
