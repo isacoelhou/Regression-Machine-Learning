@@ -9,7 +9,6 @@ import numpy as np
 from sklearn.svm import SVR
 from sklearn.neural_network import MLPRegressor
 
-
 def grid_search_KNR():
 
     maior = 10000000000
@@ -21,13 +20,9 @@ def grid_search_KNR():
 
             opiniao = KNR.predict(x_validacao)
 
-            mae = mean_absolute_error(y_validacao, opiniao)
-            mse = mean_squared_error(y_validacao, opiniao)
-            rmse = np.sqrt(mse)
+            rmse = np.sqrt( mean_squared_error(y_validacao, opiniao))
 
-            media = (mae + mse + rmse)/3
-
-            if(media < maior):
+            if(rmse < maior):
                 best_n = i
                 best_w = j
 
@@ -45,13 +40,9 @@ def grid_search_SVR():
 
             opiniao = SVR_.predict(x_validacao)
 
-            mae = mean_absolute_error(y_validacao, opiniao)
-            mse = mean_squared_error(y_validacao, opiniao)
-            rmse = np.sqrt(mse)
+            rmse = np.sqrt(mean_squared_error(y_validacao, opiniao))
 
-            media = (mae + mse + rmse)/3
-
-            if(media < maior):
+            if(rmse < maior):
                 best_k = k
                 best_i = i
 
@@ -68,13 +59,10 @@ def grid_search_MLP():
 
               SVR_.fit(x_treino, y_treino)
               opiniao = SVR_.predict(x_validacao)
-              mae = mean_absolute_error(y_validacao, opiniao)
-              mse = mean_squared_error(y_validacao, opiniao)
-              rmse = np.sqrt(mse)
-              
-              media = (mae + mse + rmse)/3
 
-              if (media > maior):
+              rmse = np.sqrt( mean_squared_error(y_validacao, opiniao))
+
+              if(rmse < maior):
                 Melhor_i = i
                 Melhor_j = j
                 Melhor_k = k
