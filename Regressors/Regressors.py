@@ -8,6 +8,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 import numpy as np
 from sklearn.svm import SVR
 from sklearn.neural_network import MLPRegressor
+from sklearn.ensemble import RandomForestRegressor
 
 def grid_search_KNR():
 
@@ -57,8 +58,8 @@ def grid_search_MLP():
           for l in ('identity', 'logistic', 'tanh', 'relu'):
               MLP = MLPRegressor(hidden_layer_sizes=(i,i,i), learning_rate=j, max_iter=k, activation=l )
 
-              SVR_.fit(x_treino, y_treino)
-              opiniao = SVR_.predict(x_validacao)
+              MLP.fit(x_treino, y_treino)
+              opiniao = MLP.predict(x_validacao)
 
               rmse = np.sqrt( mean_squared_error(y_validacao, opiniao))
 
@@ -69,6 +70,30 @@ def grid_search_MLP():
                 Melhor_l = l
 
     return Melhor_i, Melhor_j, Melhor_k, Melhor_k, Melhor_l
+
+def grid_search_RF():
+    maior = 1000000
+
+    for n_estimators in range(10, 100, 10):
+        for criterion in ('squared_error', 'absolute_error', 'friedman_mse', 'poisson'):
+            for max_deaph in range(2, 10, 1):
+                for min_sample_split in (5,6,8,10):
+                    for min_sample_leaf in (3,4,5,6):
+                        RF = RandomForestRegressor(n_estimators = n_estimators, criterion = criterion, max_depth = max_deaph, min_samples_split = min_sample_split, min_samples_leaf = min_sample_leaf)
+
+                        RF.fit(x_treino, y_treino)
+                        opiniao = RF.predict(x_validacao)
+
+                        rmse = np.sqrt( mean_squared_error(y_validacao, opiniao))
+
+                        if(rmse < maior):
+                            melhor_n_estimator = n_estimators
+                            melhor_criterion = criterion
+                            melhor_max_deaph = max_deaph
+                            melhor_min_sample_split = min_sample_split
+                            melhor_min_sample_leaf = min_sample_leaf
+
+    return melhor_n_estimator, melhor_criterion, melhor_max_deaph, melhor_min_sample_split, melhor_min_sample_leaf
 
 rmse_KNR = []
 mse_KNR = []
@@ -127,6 +152,17 @@ for _ in range(20):
 
     opiniao = MLP.predict(x_teste)
 
+    mae_MLP.append(mean_absolute_error(y_validacao, opiniao))
+    mse_MLP.append(mean_squared_error(y_validacao, opiniao))
+    rmse_MLP.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
+
+    ##############################################################################
+
+    i, j, k, l, m = grid_search_RF()
+    RF = RandomForestRegressor(n_estimators = i, criterion = j, max_depth = k, min_samples_split = l, min_samples_leaf = m)
+    RF.fit(x_treino, y_treino)
+
+    opiniao = RF.predict(x_teste)
     mae_MLP.append(mean_absolute_error(y_validacao, opiniao))
     mse_MLP.append(mean_squared_error(y_validacao, opiniao))
     rmse_MLP.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
