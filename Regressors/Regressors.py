@@ -8,7 +8,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 import numpy as np
 from sklearn.svm import SVR
 from sklearn.neural_network import MLPRegressor
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 
 def grid_search_KNR():
 
@@ -74,11 +74,11 @@ def grid_search_MLP():
 def grid_search_RF():
     maior = 1000000
 
-    for n_estimators in range(10, 100, 10):
+    for n_estimators in range(100, 1000, 100):
         for criterion in ('squared_error', 'absolute_error', 'friedman_mse', 'poisson'):
             for max_deaph in range(2, 10, 1):
-                for min_sample_split in (5,6,8,10):
-                    for min_sample_leaf in (3,4,5,6):
+                for min_sample_split in range(2, 10, 1):
+                    for min_sample_leaf in range(1, 10, 1):
                         RF = RandomForestRegressor(n_estimators = n_estimators, criterion = criterion, max_depth = max_deaph, min_samples_split = min_sample_split, min_samples_leaf = min_sample_leaf)
 
                         RF.fit(x_treino, y_treino)
@@ -95,6 +95,32 @@ def grid_search_RF():
 
     return melhor_n_estimator, melhor_criterion, melhor_max_deaph, melhor_min_sample_split, melhor_min_sample_leaf
 
+def grid_search_GB():
+    maior = 1000000
+
+    for n_estimators in range(100, 1000, 100):
+        for loss in ('squared_error', 'absolute_error', 'huber', 'quantile'):
+            for max_depth in range(2, 10, 1):
+                for learning_rate in range(0.1, 1, 0.1):
+                    for min_sample_split in range(2, 10, 1):
+                        for min_sample_leaf in range(1, 10, 1):
+                            GB = GradientBoostingRegressor(n_estimators=n_estimators, loss=loss, max_depth=max_depth, learning_rate=learning_rate, min_samples_split=min_sample_split, min_samples_leaf=min_sample_leaf)
+
+                            GB.fit(x_treino, y_treino)
+                            opiniao = GB.predict(x_validacao)
+
+                            rmse = np.sqrt( mean_squared_error(y_validacao, opiniao))
+
+                            if(rmse < maior):
+                                melhor_n_estimator = n_estimators
+                                melhor_loss = loss
+                                melhor_max_depth = max_depth
+                                melhor_learning_rate = learning_rate
+                                melhor_min_sample_split = min_sample_split
+                                melhor_min_sample_leaf = min_sample_leaf
+
+    return melhor_n_estimator, melhor_loss, melhor_max_depth, melhor_learning_rate, melhor_min_sample_split, melhor_min_sample_leaf
+
 rmse_KNR = []
 mse_KNR = []
 mae_KNR = []
@@ -106,6 +132,14 @@ mae_SVR = []
 rmse_MLP = []
 mse_MLP = []
 mae_MLP = []
+
+rmse_RF = []
+mse_RF = []
+mae_RF = []
+
+rmse_GB = []
+mse_GB = []
+mae_GB = []
 
 for _ in range(20):
 
@@ -163,6 +197,19 @@ for _ in range(20):
     RF.fit(x_treino, y_treino)
 
     opiniao = RF.predict(x_teste)
-    mae_MLP.append(mean_absolute_error(y_validacao, opiniao))
-    mse_MLP.append(mean_squared_error(y_validacao, opiniao))
-    rmse_MLP.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
+    mae_RF.append(mean_absolute_error(y_validacao, opiniao))
+    mse_RF.append(mean_squared_error(y_validacao, opiniao))
+    rmse_RF.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
+
+    ##############################################################################
+
+    i, j, k, l, m, n = grid_search_GB()
+    GB = GradientBoostingRegressor(n_estimators=i, loss=j, max_depth=k, learning_rate=l, min_samples_split=m, min_samples_leaf=n)
+
+    GB.fit(x_treino, y_treino)
+
+    opiniao = GB.predict(x_teste)
+    mae_GB.append(mean_absolute_error(y_validacao, opiniao))
+    mse_GB.append(mean_squared_error(y_validacao, opiniao))
+    rmse_GB.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
+
