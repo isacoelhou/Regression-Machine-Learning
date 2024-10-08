@@ -155,8 +155,6 @@ rmse_RLM = []
 mse_RLM = []
 mae_RLM = []
 
-
-
 for iteracao in range(20):
 
     print(iteracao)
@@ -188,9 +186,10 @@ for iteracao in range(20):
 
 
     #############################################################################
+   
     print("SVR")
     i, j = grid_search_SVR()
-    SVR_ = KNeighborsRegressor(kernel=i,C=j)
+    SVR_ = SVR(kernel=i,C=j)
     SVR_.fit(x_treino,y_treino)
 
     opiniao = SVR_.predict(x_teste)
@@ -201,6 +200,7 @@ for iteracao in range(20):
 
     
     #############################################################################
+  
     print("MLP")
     i, j, k, l = grid_search_MLP()
     MLP = MLPRegressor(hidden_layer_sizes=(i,i,i), learning_rate=j, max_iter=k, activation=l)
@@ -215,6 +215,7 @@ for iteracao in range(20):
 
 
     ##############################################################################
+   
     print("RF")
     i, j, k, l, m = grid_search_RF()
     RF = RandomForestRegressor(n_estimators = i, criterion = j, max_depth = k, min_samples_split = l, min_samples_leaf = m)
@@ -225,10 +226,9 @@ for iteracao in range(20):
     mse_RF.append(mean_squared_error(y_validacao, opiniao))
     rmse_RF.append(np.sqrt(mean_squared_error(y_validacao, opiniao)))
 
-
-
-
+  
     ##############################################################################
+    
     print("GB")
     i, j, k, l, m, n = grid_search_GB()
     GB = GradientBoostingRegressor(n_estimators=i, loss=j, max_depth=k, learning_rate=l, min_samples_split=m, min_samples_leaf=n)
@@ -244,6 +244,7 @@ for iteracao in range(20):
 
 
     ##############################################################################
+    
     print("RLM")
     RLM = LinearRegression()
 
