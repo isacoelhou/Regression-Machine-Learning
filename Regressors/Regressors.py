@@ -36,8 +36,9 @@ def grid_search_SVR():
     
     maior = 10000000000
 
-    for k in ("linear", "poly", "rbf", "sigmoid"):
+    for k in ("poly", "rbf", "sigmoid"):
         for i in (0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 1): 
+            print(k,i)
 
             SVR_ = SVR(kernel=k,C=i)
             SVR_.fit(x_treino, y_treino)
@@ -74,16 +75,17 @@ def grid_search_MLP():
                 Melhor_k = k
                 Melhor_l = l
 
-    return Melhor_i, Melhor_j, Melhor_k, Melhor_k, Melhor_l
+    return Melhor_i, Melhor_j, Melhor_k, Melhor_l
 
 def grid_search_RF():
     maior = 1000000
 
-    for n_estimators in range(100, 1000, 100):
-        for criterion in ('squared_error', 'absolute_error', 'friedman_mse', 'poisson'):
-            for max_deaph in range(2, 10, 1):
+    for criterion in ('squared_error', 'absolute_error', 'friedman_mse', 'poisson'):
+        for n_estimators in (100, 150, 200, 250):
+            for max_deaph in (2, 3, 5, 6):
                 for min_sample_split in (2, 3, 4, 5):
                     for min_sample_leaf in (1, 2, 3, 4):
+                        print(n_estimators,criterion, max_deaph, min_sample_split,min_sample_leaf)
                         RF = RandomForestRegressor(n_estimators = n_estimators, criterion = criterion, max_depth = max_deaph,
                         min_samples_split = min_sample_split, min_samples_leaf = min_sample_leaf)
 
@@ -105,14 +107,16 @@ def grid_search_RF():
 def grid_search_GB():
     maior = 1000000
 
-    for n_estimators in range(100, 1000, 100):
-        for loss in ('squared_error', 'absolute_error', 'huber', 'quantile'):
-            for max_depth in range(2, 10, 1):
-                for learning_rate in range(0.1, 1, 0.2):
+    for loss in ('squared_error', 'absolute_error', 'huber', 'quantile'):
+        for n_estimators in (100, 150, 200, 250):
+            for max_depth in (2, 3, 5, 6):
+                for learning_rate in (0.1, 0.2, 0.3, 0.4):
                     for min_sample_split in (2, 3, 4, 5):
                         for min_sample_leaf in (1, 2, 3, 4):
+                            print(n_estimators,loss,max_depth,learning_rate,min_sample_split,min_sample_leaf)
                             GB = GradientBoostingRegressor(n_estimators=n_estimators, loss=loss, max_depth=max_depth,
                             learning_rate=learning_rate, min_samples_split=min_sample_split, min_samples_leaf=min_sample_leaf)
+                            
 
                             GB.fit(x_treino, y_treino)
                             opiniao = GB.predict(x_validacao)
